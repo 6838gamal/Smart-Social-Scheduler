@@ -1,0 +1,12 @@
+[
+  {
+    "keyword": "مرحباً",
+    "response": "تفضل",
+    "scope": "private"
+  },
+  {
+    "keyword": "السلام عليكم",
+    "response": "وعليكم السلام ورحمة الله وبركاته",
+    "scope": "private"
+  }
+]
