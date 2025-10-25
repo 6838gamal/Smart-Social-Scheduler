@@ -1,3 +1,0 @@
-export SMART_SCHEDULER_TOKEN="8402278212:AAFmTWzAtrvF9SOy9sdwduz1LmNrT_oqHmo"
-export GOOGLE_CLIENT_ID="1015270124270-fg53ehvs093roual651kppfq5rpmm56t.apps.googleusercontent.com"
-export GOOGLE_CLIENT_SECRET="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"
