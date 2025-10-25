@@ -5,9 +5,10 @@ from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     CallbackQueryHandler,
-MessageHandler,
+    MessageHandler,
     ContextTypes,
-filters
+    filters,
+    BaseHandler
 )
 
 # ---------------------------
@@ -22,7 +23,7 @@ from modules.settings.settings import show_settings, handle_settings_selection
 from modules.events.events import show_events, handle_events_selection
 from modules.ai_assistant.ai_assistant import show_ai_assistant, handle_ai_assistant_selection
 from modules.inbox.email_inbox import handle_email_inbox_callback
-from modules.inbox.telegram_inbox import show_telegram_inbox, handle_inbox_selection as handle_telegram_inbox_callback
+from modules.inbox.telegram_inbox import show_telegram_inbox, handle_inbox_selection as handle_telegram_inbox_callback, handle_telegram_auth_messages
 
 # 🆕 الأقسام الجديدة
 from modules.tracker.tracker import show_tracker, handle_tracker_selection
@@ -146,7 +147,12 @@ if __name__ == "__main__":
     app.add_handler(CallbackQueryHandler(handle_email_inbox_callback, pattern="^email_"))
     app.add_handler(CallbackQueryHandler(show_telegram_inbox, pattern="^telegram_"))
     app.add_handler(CallbackQueryHandler(handle_telegram_inbox_callback, pattern="^(start_telegram|back_to_main|open_chat_|next_msg|prev_msg|back_to_list)"))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_add_reply_messages))
+    
+    # ---------- MessageHandlers ----------
+    # معالج رسائل تسجيل الدخول للتلجرام (له أولوية أعلى)
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_telegram_auth_messages), group=0)
+    # معالج الردود التلقائية
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_add_reply_messages), group=1)
     app.add_handler(CallbackQueryHandler(handle_add_reply_callbacks, pattern="^scope_"))
 #    app.add_handler(CallbackQueryHandler(handle_custom_reply_selection))
 

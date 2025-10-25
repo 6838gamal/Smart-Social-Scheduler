@@ -47,30 +47,14 @@ def save_data():
     except Exception as e:
         logger.exception("Failed to save data: %s", e)
 
-# ---------- interactive Telethon sign-in ----------
-async def ensure_telethon_authorized() -> bool:
+# ---------- check if authorized ----------
+async def check_telethon_authorized() -> bool:
     try:
         if not client.is_connected():
             await client.connect()
-
-        if await client.is_user_authorized():
-            return True
-
-        print("\n[Telethon] تسجيل الدخول لأول مرة...")
-        phone = input("📱 أدخل رقم هاتفك (مثلاً +9677...): ").strip()
-        await client.send_code_request(phone)
-        code = input("🔢 أدخل الكود الذي وصلك على التليجرام: ").strip()
-
-        try:
-            await client.sign_in(phone, code)
-        except errors.SessionPasswordNeededError:
-            pwd = input("🔒 الحساب محمي بكلمة مرور، أدخلها: ").strip()
-            await client.sign_in(password=pwd)
-
         return await client.is_user_authorized()
-
     except Exception as e:
-        logger.exception("Authorization failed: %s", e)
+        logger.exception("Check authorization failed: %s", e)
         return False
 
 # ---------- show inbox button ----------
@@ -97,6 +81,23 @@ async def handle_inbox_selection(update: Update, context: ContextTypes.DEFAULT_T
     data = query.data
 
     if data == "start_telegram":
+        # التحقق من تسجيل الدخول
+        if not client.is_connected():
+            await client.connect()
+        
+        if not await client.is_user_authorized():
+            # طلب تسجيل الدخول
+            context.user_data['telethon_auth_step'] = 'waiting_phone'
+            await query.edit_message_text(
+                "📱 *تسجيل الدخول إلى حساب تليجرام*\n\n"
+                "يرجى إرسال رقم هاتفك الدولي\n"
+                "مثال: +967771234567\n\n"
+                "⚠️ تأكد من البدء بعلامة + ورمز الدولة",
+                parse_mode="Markdown"
+            )
+            return
+        
+        # إذا كان مسجل دخول، نبدأ السحب
         await query.edit_message_text("⏳ جاري سحب آخر 10 رسائل من كل دردشة...")
         await fetch_all_dialogs(update, context)
 
@@ -113,14 +114,103 @@ async def handle_inbox_selection(update: Update, context: ContextTypes.DEFAULT_T
     elif data == "back_to_list":
         await show_dialog_list(update, context)
 
+    elif data == "back_to_main":
+        # الرجوع للقائمة الرئيسية
+        context.user_data.pop('telethon_auth_step', None)
+        from bot import show_main_menu
+        await show_main_menu(update, context)
+
     else:
         await query.answer("❌ الخيار غير معروف", show_alert=True)
+
+# ---------- handle text messages for auth ----------
+async def handle_telegram_auth_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """معالجة رسائل تسجيل الدخول"""
+    if not context.user_data.get('telethon_auth_step'):
+        return
+    
+    step = context.user_data['telethon_auth_step']
+    text = update.message.text.strip()
+    
+    try:
+        if step == 'waiting_phone':
+            # حفظ الرقم
+            context.user_data['telethon_phone'] = text
+            
+            # إرسال كود التحقق
+            if not client.is_connected():
+                await client.connect()
+            
+            await client.send_code_request(text)
+            context.user_data['telethon_auth_step'] = 'waiting_code'
+            
+            await update.message.reply_text(
+                "✅ تم إرسال كود التحقق إلى تليجرام\n\n"
+                "🔢 يرجى إرسال الكود الذي وصلك\n"
+                "مثال: 12345"
+            )
+        
+        elif step == 'waiting_code':
+            phone = context.user_data.get('telethon_phone')
+            
+            try:
+                await client.sign_in(phone, text)
+                # نجح التسجيل
+                context.user_data.pop('telethon_auth_step', None)
+                context.user_data.pop('telethon_phone', None)
+                
+                await update.message.reply_text(
+                    "✅ تم تسجيل الدخول بنجاح!\n\n"
+                    "الآن يمكنك سحب رسائلك من قسم الوارد"
+                )
+                await show_telegram_inbox(update, context)
+                
+            except errors.SessionPasswordNeededError:
+                # يحتاج كلمة مرور
+                context.user_data['telethon_auth_step'] = 'waiting_password'
+                await update.message.reply_text(
+                    "🔒 حسابك محمي بكلمة مرور (2FA)\n\n"
+                    "يرجى إرسال كلمة المرور"
+                )
+            except errors.PhoneCodeInvalidError:
+                await update.message.reply_text(
+                    "❌ الكود غير صحيح\n\n"
+                    "يرجى إرسال الكود الصحيح"
+                )
+            except Exception as e:
+                logger.exception("Sign in error: %s", e)
+                await update.message.reply_text(f"❌ حدث خطأ: {str(e)}")
+        
+        elif step == 'waiting_password':
+            phone = context.user_data.get('telethon_phone')
+            
+            try:
+                await client.sign_in(password=text)
+                # نجح التسجيل
+                context.user_data.pop('telethon_auth_step', None)
+                context.user_data.pop('telethon_phone', None)
+                
+                await update.message.reply_text(
+                    "✅ تم تسجيل الدخول بنجاح!\n\n"
+                    "الآن يمكنك سحب رسائلك من قسم الوارد"
+                )
+                await show_telegram_inbox(update, context)
+                
+            except Exception as e:
+                logger.exception("Password sign in error: %s", e)
+                await update.message.reply_text(f"❌ كلمة المرور غير صحيحة")
+    
+    except Exception as e:
+        logger.exception("Auth message handler error: %s", e)
+        await update.message.reply_text(f"❌ حدث خطأ: {str(e)}")
 
 # ---------- fetch dialogs (limit 10 messages) ----------
 async def fetch_all_dialogs(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        ok = await ensure_telethon_authorized()
-        if not ok:
+        if not client.is_connected():
+            await client.connect()
+        
+        if not await client.is_user_authorized():
             await update.callback_query.edit_message_text("❌ لم يتم تسجيل الدخول إلى Telethon.")
             return
 

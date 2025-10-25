@@ -17,6 +17,8 @@ Smart Social Scheduler is a Telegram bot application for managing social media c
 - All required secrets added to Replit Secrets
 - Fixed Telegram inbox callback handling - buttons now work correctly
 - Cleaned up unused files (em_re1.py, em_read.py, gmail-reader.py)
+- Improved Telegram inbox login: Now requests phone number via Telegram interface instead of console
+- Added interactive authentication flow: phone → code → password (if needed)
 
 ## Required Environment Variables
 The following secrets must be set in Replit Secrets (Tools → Secrets):
