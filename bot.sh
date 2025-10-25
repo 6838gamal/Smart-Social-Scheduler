@@ -1,13 +1,23 @@
 #!/bin/bash
 
-# المتغيرات بنفس الأسماء المستخدمة في المحادثة
-SMART_SCHEDULER_TOKEN="8402278212:AAFmTWzAtrvF9SOy9sdwduz1LmNrT_oqHmo"
-GOOGLE_CLIENT_ID="1015270124270-fg53ehvs093roual651kppfq5rpmm56t.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="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"
+# Environment variables should be set in Replit Secrets
+# This script validates that required environment variables are set
 
-# استخدام المتغيرات
 echo "=== إعدادات البوت ==="
-echo "التوكن: ${SMART_SCHEDULER_TOKEN:0:10}..."
-echo "العميل: ${GOOGLE_CLIENT_ID:0:10}..."
-echo "السر: ${GOOGLE_CLIENT_SECRET:0:10}..."
-echo "✅ جاهز للاستخدام"
+if [ -z "$SMART_SCHEDULER_TOKEN" ]; then
+    echo "❌ SMART_SCHEDULER_TOKEN not set"
+else
+    echo "✅ SMART_SCHEDULER_TOKEN is set"
+fi
+
+if [ -z "$GOOGLE_CLIENT_ID" ]; then
+    echo "❌ GOOGLE_CLIENT_ID not set"
+else
+    echo "✅ GOOGLE_CLIENT_ID is set"
+fi
+
+if [ -z "$GOOGLE_CLIENT_SECRET" ]; then
+    echo "❌ GOOGLE_CLIENT_SECRET not set"
+else
+    echo "✅ GOOGLE_CLIENT_SECRET is set"
+fi

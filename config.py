@@ -1,7 +1,7 @@
 # config.py
 import os
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8402278212:AAFmTWzAtrvF9SOy9sdwduz1LmNrT_oqHmo")
+BOT_TOKEN = os.getenv("SMART_SCHEDULER_TOKEN")
 PROJECT_NAME = "Smart Social Scheduler"
 
 MESSAGES = {
