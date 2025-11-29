@@ -1,0 +1,128 @@
+
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "A user of the application.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL of the user's profile photo."
+        }
+      },
+      "required": ["uid", "email"]
+    },
+    "googleConnection": {
+      "title": "Google Connection",
+      "description": "Represents a connected Google account for a user, including OAuth tokens and enabled services.",
+      "type": "object",
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "description": "A unique identifier for the connection (e.g., the user's Google email address)."
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["google"],
+          "description": "The service provider."
+        },
+        "emailAddress": {
+          "type": "string",
+          "format": "email",
+          "description": "The email address of the connected account."
+        },
+        "connectedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the account was connected."
+        },
+        "services": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["gmail", "drive"]
+            },
+            "description": "A list of connected Google services."
+        }
+      },
+      "required": ["connectionId", "provider", "emailAddress", "connectedAt", "services"]
+    },
+    "emailMessage": {
+      "title": "Email Message",
+      "description": "Represents a single email message in the user's inbox.",
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "The sender's name."
+        },
+        "fromEmail": {
+          "type": "string",
+          "format": "email",
+          "description": "The sender's email address."
+        },
+        "avatarUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the sender's avatar."
+        },
+        "subject": {
+          "type": "string",
+          "description": "The email subject."
+        },
+        "content": {
+          "type": "string",
+          "description": "The body of the email."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time the email was received."
+        },
+        "read": {
+          "type": "boolean",
+          "description": "Whether the email has been read."
+        }
+      },
+      "required": ["from", "fromEmail", "subject", "content", "timestamp"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com", "password"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/user"
+      },
+      "description": "Stores user profile information."
+    },
+    "/users/{userId}/connections/{connectionId}": {
+      "schema": {
+        "$ref": "#/entities/googleConnection"
+      },
+      "description": "Stores connected account information for a user. The tokens for OAuth should be stored in a separate, more secure sub-collection with stricter access rules."
+    },
+    "/users/{userId}/emails/{emailId}": {
+      "schema": {
+        "$ref": "#/entities/emailMessage"
+      },
+      "description": "Stores email messages for a user."
+    }
+  }
+}

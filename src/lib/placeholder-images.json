@@ -1,0 +1,70 @@
+{
+  "placeholderImages": [
+    {
+      "id": "top-post",
+      "description": "Abstract gradient art",
+      "imageUrl": "https://picsum.photos/seed/1/600/400",
+      "imageHint": "abstract gradient"
+    },
+    {
+      "id": "library-1",
+      "description": "Man working on a laptop in a cafe",
+      "imageUrl": "https://picsum.photos/seed/2/400/300",
+      "imageHint": "laptop cafe"
+    },
+    {
+      "id": "library-2",
+      "description": "A vibrant city street at night",
+      "imageUrl": "https://picsum.photos/seed/3/400/300",
+      "imageHint": "city night"
+    },
+    {
+      "id": "library-3",
+      "description": "A close-up of a camera lens",
+      "imageUrl": "https://picsum.photos/seed/4/400/300",
+      "imageHint": "camera lens"
+    },
+    {
+      "id": "library-4",
+      "description": "A notebook and a pen on a wooden table",
+      "imageUrl": "https://picsum.photos/seed/5/400/300",
+      "imageHint": "notebook writing"
+    },
+    {
+      "id": "library-5",
+      "description": "A serene mountain landscape",
+      "imageUrl": "https://picsum.photos/seed/6/400/300",
+      "imageHint": "mountain landscape"
+    },
+    {
+      "id": "library-6",
+      "description": "Abstract colorful shapes",
+      "imageUrl": "https://picsum.photos/seed/7/400/300",
+      "imageHint": "abstract shapes"
+    },
+    {
+      "id": "user-avatar-gamal",
+      "description": "Portrait of a smiling man",
+      "imageUrl": "https://picsum.photos/seed/8/40/40",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "user-avatar-1",
+      "description": "Portrait of a woman",
+      "imageUrl": "https://picsum.photos/seed/9/40/40",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "user-avatar-2",
+      "description": "Portrait of a person with glasses",
+      "imageUrl": "https://picsum.photos/seed/10/40/40",
+      "imageHint": "person glasses"
+    },
+    {
+      "id": "user-avatar-3",
+      "description": "Candid portrait of a person",
+      "imageUrl": "https://picsum.photos/seed/11/40/40",
+      "imageHint": "person candid"
+    }
+  ]
+}
